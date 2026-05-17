@@ -1,254 +1,267 @@
-# 🐍 Snake Game - Finger Gesture Control
+# Snake Finger Control
 
-Game Snake klasik dengan kontrol menggunakan **gesture jari tangan** melalui webcam.
+Game Snake berbasis Python yang bisa dimainkan dengan gerakan jari melalui webcam. Game ini memakai Pygame untuk tampilan, OpenCV untuk input kamera, dan MediaPipe HandLandmarker untuk membaca landmark tangan secara real-time.
 
-Gunakan **jari telunjuk Anda** untuk mengontrol gerakan ular secara real-time dengan MediaPipe Hand Detection.
+Jika webcam tidak tersedia, game tetap bisa dimainkan dengan keyboard.
 
----
+## Fitur
 
-## 🎮 Fitur Utama
+- Kontrol ular dengan gerakan jari telunjuk ke kanan, kiri, atas, atau bawah.
+- Fallback keyboard menggunakan `WASD` atau tombol panah.
+- Menu awal dengan pilihan difficulty: `Easy`, `Normal`, dan `Hard`.
+- Pause dan resume melalui keyboard atau gesture telapak tangan.
+- Gesture kepalan tangan untuk mulai atau restart dari menu/game over.
+- High score permanen disimpan di `scores.json`.
+- Efek partikel saat makan dan game over.
+- Preview webcam di dalam layar game dengan visualisasi skeleton tangan.
+- Feature flags di `config.py` untuk menyalakan atau mematikan fitur tambahan tanpa menghapus kode.
 
-✨ **Gesture Control**
+## Status Fitur Saat Ini
 
-- Gerakkan jari telunjuk ke **Kanan/Kiri/Atas/Bawah** untuk mengontrol ular
-- Threshold adaptif untuk menghindari noise gerakan
-- Fallback ke keyboard (WASD) jika webcam tidak terdeteksi
+Fitur utama untuk demo saat ini aktif secara default:
 
-🤖 **MediaPipe Hand Tracking (Tasks API v0.10+)**
+| Fitur | Status Default |
+| --- | --- |
+| Kontrol gesture | Aktif |
+| Kontrol keyboard | Aktif |
+| Score | Aktif |
+| High score | Aktif |
+| Menu utama | Aktif |
+| Pause/resume | Aktif |
+| Restart/reset | Aktif |
+| Pilihan difficulty | Aktif |
+| Preview webcam | Aktif |
+| Skeleton tangan | Aktif |
+| Efek partikel dasar | Aktif |
 
-- Deteksi tangan real-time dengan akurasi tinggi
-- Skeleton hand visualization (tulang tangan tampak di layar)
-- Running mode VIDEO untuk tracking smooth antar frame
+Fitur tambahan berikut sudah tersedia di kode, tetapi default-nya dimatikan agar progress demo bisa bertahap:
 
-🎨 **Visual Polish**
+| Fitur Tambahan | Status Default |
+| --- | --- |
+| Level progression | Nonaktif |
+| Speed-up berdasarkan level | Nonaktif |
+| Obstacle | Nonaktif |
+| Random power-up | Nonaktif |
+| Advanced power-up (`2X`, `SH`, `G`) | Nonaktif |
+| Gesture dua jari untuk skill | Nonaktif |
 
-- Grid-based playground
-- Animasi ular dengan shading gradient
-- Partikel efek saat makan makanan
-- Preview webcam live di corner game
-- UI score real-time
+## Requirement
 
-🔄 **Gameplay**
+- Python 3.10 atau lebih baru.
+- Webcam, jika ingin memakai kontrol gesture.
+- Dependency Python:
+  - `pygame-ce`
+  - `opencv-python-headless`
+  - `mediapipe`
+  - `numpy`
 
-- Semakin panjang semakin cepat
-- Makanan muncul random
-- Collision detection dengan dinding dan badan sendiri
-- Restart dan quit command
+Catatan: gunakan `pygame-ce`, bukan package `pygame` biasa.
 
----
+## Instalasi
 
-## 📋 Requirements
-
-| Komponen               | Versi Minimum                  |
-| ---------------------- | ------------------------------ |
-| Python                 | >= 3.10                        |
-| pygame-ce              | >= 2.5                         |
-| mediapipe              | >= 0.10.x                      |
-| opencv-python-headless | >= 4.x                         |
-| numpy                  | >= 1.20                        |
-| Webcam                 | Diperlukan (USB atau built-in) |
-
-### ⚠️ Catatan Penting
-
-- **Gunakan `pygame-ce`** (Community Edition), BUKAN `pygame` biasa
-- **MediaPipe >= 0.10** menggunakan Tasks API baru (tanpa `.solutions`)
-- Model `hand_landmarker.task` akan **otomatis didownload** (~5 MB) saat pertama kali
-- Kompatibel dengan Python 3.10, 3.11, 3.12, 3.13, 3.14+
-
----
-
-## 🚀 Instalasi
-
-### 1. Persiapan Environment (Opsional tapi Recommended)
+1. Clone atau buka folder project ini.
 
 ```bash
-# Buat virtual environment
-python -m venv venv
+cd snake-learn
+```
 
-# Aktifkan
-# Pada Windows:
+2. Buat virtual environment.
+
+Windows:
+
+```bash
+python -m venv venv
 venv\Scripts\activate
-# Pada macOS/Linux:
+```
+
+macOS/Linux:
+
+```bash
+python -m venv venv
 source venv/bin/activate
 ```
 
-### 2. Install Dependencies
+3. Install dependency.
 
 ```bash
-# SANGAT PENTING: Uninstall pygame biasa (jika ada)
 pip uninstall pygame -y
-
-# Install dependencies yang diperlukan
 pip install pygame-ce opencv-python-headless mediapipe numpy
 ```
 
-### 3. Jalankan Game
+4. Jalankan game.
 
 ```bash
 python snake_finger_control.py
 ```
 
-**Pada jalankan pertama:**
+Saat pertama kali dijalankan, aplikasi akan memastikan file model `hand_landmarker.task` tersedia. Jika file belum ada, aplikasi akan mencoba mengunduh model MediaPipe secara otomatis.
 
-- Script akan otomatis **download model MediaPipe** (~5 MB)
-- Tunggu hingga muncul pesan ✅ "Model ditemukan"
-- Game akan terbuka dengan preview webcam
+## Cara Bermain
 
----
+Di menu awal:
 
-## 🎮 Cara Bermain
+| Input | Aksi |
+| --- | --- |
+| `Enter` / `Space` | Mulai game |
+| `Tab` | Ganti difficulty |
+| `Q` / `Esc` | Keluar |
+| Kepalan tangan | Mulai game |
 
-### Kontrol Ular
+Saat bermain:
 
-| Input                   | Aksi                                  |
-| ----------------------- | ------------------------------------- |
-| 🖐️ **Geser Jari Kanan** | Ular bergerak ke KANAN                |
-| 🖐️ **Geser Jari Kiri**  | Ular bergerak ke KIRI                 |
-| 🖐️ **Geser Jari Atas**  | Ular bergerak ke ATAS                 |
-| 🖐️ **Geser Jari Bawah** | Ular bergerak ke BAWAH                |
-| ⌨️ **W/A/S/D**          | Fallback keyboard (jika webcam error) |
-| ⌨️ **R**                | Restart game                          |
-| ⌨️ **Q**                | Quit game                             |
+| Input | Aksi |
+| --- | --- |
+| Geser telunjuk ke kanan | Ular bergerak ke kanan |
+| Geser telunjuk ke kiri | Ular bergerak ke kiri |
+| Geser telunjuk ke atas | Ular bergerak ke atas |
+| Geser telunjuk ke bawah | Ular bergerak ke bawah |
+| Telapak tangan | Pause / resume |
+| `WASD` / tombol panah | Kontrol keyboard |
+| `Space` / `P` | Pause / resume |
+| `Q` / `Esc` | Keluar |
 
-### Tips Bermain
+Catatan: gesture dua jari untuk skill sudah ada di kode, tetapi default-nya dimatikan melalui `ENABLE_GESTURE_POWER_SKILL = False`.
 
-- 🎯 **Posisikan tangan** di depan webcam dengan jarak ~20-50 cm
-- 👆 **Gunakan jari telunjuk** (jari yang paling stabil untuk tracking)
-- 💨 **Gerakan cepat dan jelas** untuk responsif maksimal
-- 📱 **Jangan kurangi cahaya** — pastikan lighting baik
-- 🚀 **Semakin lama survival** = semakin cepat ular bergerak
+Saat game over:
 
----
+| Input | Aksi |
+| --- | --- |
+| `R` | Restart |
+| `M` | Kembali ke menu |
+| `Q` / `Esc` | Keluar |
+| Kepalan tangan | Restart |
 
-## ⚙️ Konfigurasi (Opsional)
+## Tips Kontrol Gesture
 
-Edit bagian **KONSTANTA & KONFIGURASI** di `snake_finger_control.py`:
+- Posisikan tangan di depan webcam dengan pencahayaan yang cukup.
+- Gunakan jari telunjuk sebagai input arah utama.
+- Gerakkan jari dengan jelas melewati threshold gerakan minimal.
+- Jika gesture tidak stabil, coba jauhkan tangan sedikit dari kamera atau tingkatkan pencahayaan.
+- Jika kamera gagal dibuka, game otomatis masuk mode keyboard.
 
-```python
-SCREEN_W, SCREEN_H  = 800, 600        # Ukuran layar
-CELL_SIZE           = 20               # Ukuran grid cell
-SNAKE_SPEED         = 8                # Update speed ular (frame)
-FINGER_THRESHOLD    = 25               # Min pixel delta untuk trigger arah baru
-CAM_W, CAM_H        = 200, 150        # Ukuran preview webcam
-FPS                 = 60               # Frame rate game
+## Struktur Project
+
+```text
+snake_finger_control.py  Entry point, cek dependency, cek model, lalu menjalankan game.
+config.py                Konstanta dan feature flags untuk mengatur fitur aktif/nonaktif.
+game.py                  Controller utama: menu, loop gameplay, skor, level, obstacle, power-up.
+hand_tracker.py          Thread webcam, MediaPipe HandLandmarker, arah jari, dan event gesture.
+gestures.py              Klasifikasi gesture sederhana: telapak, kepalan, dan dua jari.
+entities.py              Entity game: Snake, Food, PowerUp, Particle.
+renderer.py              Rendering UI, arena, snake, power-up, webcam preview, dan overlay.
+model_utils.py           Validasi dan download model MediaPipe.
+storage.py               Load/save high score ke scores.json.
+scores.json              Data skor lokal.
+hand_landmarker.task     Model MediaPipe HandLandmarker.
+FITUR.md                 Ringkasan fitur dan modularisasi project.
 ```
 
----
+## Konfigurasi
 
-## 🐛 Troubleshooting
-
-### ❌ "Webcam tidak ditemukan!"
-
-**Solusi:**
-
-1. Pastikan webcam sudah tersambung dan aktif
-2. Cek di Windows Settings → Privacy → Camera (izin aplikasi)
-3. Gunakan keyboard (WASD) sebagai fallback
-4. Restart aplikasi
-
-### ❌ "RuntimeError: There is no current event loop in thread 'MainThread'" (Python 3.14+ Windows)
-
-**Solusi:** Script sudah handle otomatis, tapi jika masih error:
+Pengaturan utama ada di `config.py`.
 
 ```python
-# Tambahkan di main() sebelum menjalankan game:
-import asyncio
-if sys.platform == "win32":
-    asyncio.set_event_loop(asyncio.new_event_loop())
+SCREEN_W, SCREEN_H = 800, 600
+CELL_SIZE = 20
+FPS = 60
+SNAKE_SPEED = 8
+FINGER_THRESHOLD = 25
+CAM_W, CAM_H = 200, 150
+POWERUP_DURATION = 8.0
+POWERUP_SPAWN_SEC = 7.0
 ```
 
-### ❌ "Gesture tidak responsif / lag"
+Feature flags utama juga ada di `config.py`.
 
-**Penyebab & Solusi:**
+```python
+# Fitur utama presentasi.
+ENABLE_GESTURE_CONTROL = True
+ENABLE_KEYBOARD_CONTROL = True
+ENABLE_SCORE = True
+ENABLE_HIGH_SCORE = True
+ENABLE_MENU = True
+ENABLE_PAUSE = True
+ENABLE_RESET = True
+ENABLE_DIFFICULTY_SELECT = True
+ENABLE_WEBCAM_PREVIEW = True
+ENABLE_HAND_SKELETON = True
 
-- ✅ Pencahayaan kurang → Tingkatkan cahaya di sekitar
-- ✅ Threshold terlalu tinggi → Kurangi `FINGER_THRESHOLD` ke 15-20
-- ✅ Webcam resolution rendah → Update driver atau gunakan USB camera
-- ✅ Gerakan terlalu lambat → Gerak jari lebih cepat dan jelas
+# Fitur tambahan untuk milestone berikutnya.
+ENABLE_LEVEL_PROGRESS = False
+ENABLE_LEVEL_SPEEDUP = False
+ENABLE_OBSTACLES = False
+ENABLE_POWERUPS = False
+ENABLE_ADVANCED_POWERUPS = False
+ENABLE_PARTICLES = True
+ENABLE_GESTURE_POWER_SKILL = False
+```
 
-### ❌ "ModuleNotFoundError: No module named 'pygame'"
+Difficulty juga diatur di `config.py`.
 
-**Solusi:**
+```python
+DIFFICULTIES = {
+    "Easy": {"speed": 10, "obstacles": False},
+    "Normal": {"speed": 8, "obstacles": True},
+    "Hard": {"speed": 6, "obstacles": True},
+}
+```
+
+Nilai `speed` yang lebih kecil berarti ular bergerak lebih cepat.
+
+Catatan: obstacle pada difficulty `Normal` dan `Hard` baru dipakai jika `ENABLE_OBSTACLES = True` dan level progression aktif.
+
+## Troubleshooting
+
+### Webcam tidak ditemukan
+
+- Pastikan webcam tersambung dan tidak sedang dipakai aplikasi lain.
+- Cek izin kamera di sistem operasi.
+- Jalankan ulang game.
+- Gunakan `WASD` atau tombol panah sebagai fallback.
+
+### ModuleNotFoundError untuk pygame, cv2, mediapipe, atau numpy
+
+Install ulang dependency:
 
 ```bash
 pip uninstall pygame -y
-pip install pygame-ce
+pip install pygame-ce opencv-python-headless mediapipe numpy
 ```
 
-### ❌ Model tidak bisa download otomatis
+### Model MediaPipe gagal diunduh
 
-**Solusi Manual:**
+Download manual file model dari:
 
-1. Download dari: https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
-2. Rename menjadi `hand_landmarker.task`
-3. Simpan di **folder yang sama** dengan script `snake_finger_control.py`
-4. Jalankan ulang
-
----
-
-## 📊 Struktur Code
-
-```
-snake_finger_control.py
-├── Konstanta & Warna            (baris 1-60)
-├── Helper (Download Model)       (baris 61-100)
-├── Class HandTracker            (baris 101-250)
-│   └── Thread OpenCV + MediaPipe (Gesture Detection)
-├── Class Game                    (baris 251-400)
-│   ├── Grid & Snake State
-│   ├── Food Spawn & Collision
-│   └── Render & Score
-└── Main Loop                     (baris 400+)
-    ├── Event Handling
-    ├── Gesture Input
-    ├── Game Update
-    └── Render
+```text
+https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
 ```
 
----
+Simpan dengan nama `hand_landmarker.task` di folder yang sama dengan `snake_finger_control.py`.
 
-## 🔬 Technical Details
+### Gesture terasa lambat atau tidak responsif
 
-### Deteksi Gerakan
+- Pastikan pencahayaan cukup.
+- Gerakkan jari lebih jelas.
+- Ubah `FINGER_THRESHOLD` di `config.py` ke nilai lebih kecil, misalnya `15` atau `20`.
+- Tutup aplikasi lain yang memakai kamera.
 
-- **Algoritma:** Hitung delta posisi jari telunjuk antar frame
-- **Threshold:** Gerakan harus minimal `FINGER_THRESHOLD` px untuk trigger arah baru
-- **Dominance:** Ambil komponen (X/Y) yang paling dominan
+## Menyimpan Skor
 
-### Thread Model
+Skor terbaik, skor terakhir, total permainan, dan level terbaik disimpan di `scores.json`. File ini akan diperbarui otomatis setelah game over.
 
-```
-Thread 1 (Background):
-  Webcam Input → MediaPipe Detection → Gesture Compute → Update Shared State
+Penyimpanan high score aktif jika `ENABLE_HIGH_SCORE = True`.
 
-Thread 2 (Main - Pygame):
-  Get Direction → Game Logic → Render → Display
-  (Protected by Lock untuk synchronization)
-```
+## Fitur Tambahan yang Bisa Diaktifkan Nanti
 
-### MediaPipe Tasks API (v0.10+)
+Beberapa fitur sengaja dimatikan dulu untuk kebutuhan progress presentasi. Untuk mengaktifkannya, ubah nilai feature flag di `config.py` dari `False` menjadi `True`.
 
-- **Mode:** VIDEO (memerlukan timestamp monotonic)
-- **Input:** `mp.Image` (RGB)
-- **Output:** `HandLandmarkerResult` (21 landmarks per tangan)
-- **No `.solutions` API** — gunakan `vision.HandLandmarker` langsung
+- `ENABLE_LEVEL_PROGRESS`: mengaktifkan kenaikan level berdasarkan skor.
+- `ENABLE_LEVEL_SPEEDUP`: membuat ular semakin cepat saat level naik.
+- `ENABLE_OBSTACLES`: menampilkan obstacle pada level tertentu.
+- `ENABLE_POWERUPS`: mengaktifkan spawn power-up acak.
+- `ENABLE_ADVANCED_POWERUPS`: mengaktifkan power-up lanjutan seperti double score, shield, dan ghost.
+- `ENABLE_GESTURE_POWER_SKILL`: mengaktifkan gesture dua jari untuk skill slow motion.
 
----
+## Lisensi
 
-## 📝 License
-
-Free to use & modify. Enjoy! 🎮
-
----
-
-## 🤝 Kontribusi
-
-Punya ide atau bug report?
-
-- Pastikan webcam working
-- Test dengan minimal 3 gestures berbeda
-- Report dengan versi Python & OS Anda
-
----
-
-**Happy Gaming! 🐍✨**
+Project ini bebas digunakan dan dimodifikasi untuk belajar atau eksperimen.
